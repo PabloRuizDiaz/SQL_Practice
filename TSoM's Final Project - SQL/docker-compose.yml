@@ -1,0 +1,39 @@
+version: "3.3"
+name: FinalProject_SQL
+
+services:
+  rawDatabase:
+    image: mysql
+    container_name: rawDatabase
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'rawDatabase'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: 'admin'       # User
+      MYSQL_ROOT_PASSWORD: 'admin'  # SuperUser
+    ports:
+      - 3307:3306
+    volumes:
+      - type: bind
+        source: .
+        target: /opt/rawDatabase
+
+  VivaKHR:
+    image: mysql
+    container_name: VivaKHR
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'VivaKHR'
+      MYSQL_ROOT_PASSWORD: 'admin'
+    ports:
+      - 3308:3306
+    volumes:
+      - type: bind
+        source: .
+        target: /opt/VivaKHR
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
