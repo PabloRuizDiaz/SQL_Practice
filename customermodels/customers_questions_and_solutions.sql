@@ -257,13 +257,21 @@ LEFT JOIN (
 
 -- 3) Extract employee number, employee full name, customer count per employee, total customers of the office, 
 -- and employee customer percentage (calculated as customer count per employee / customers of the office) of all the employees.
+-- Then create a new variable to assign five categories regarding quality as sellers, and then sorting them from best to worst.
 SELECT 
 	e.employeeNumber 
 	, CONCAT(e.lastName, ', ', e.firstName) AS fullName
 	, e.officeCode 
 	, COUNT(c.customerNumber) AS customerCount
 	, t1.customerCountPerOffice
-	, ROUND(100 * COUNT(c.customerNumber) / t1.customerCountPerOffice, 2) AS employeeCustomerPercentage  
+	, ROUND(100 * COUNT(c.customerNumber) / t1.customerCountPerOffice, 2) AS employeeCustomerPercentage
+	, CASE 
+		WHEN ROUND(100 * COUNT(c.customerNumber) / t1.customerCountPerOffice, 2) >= 90 THEN '5 stars'
+		WHEN ROUND(100 * COUNT(c.customerNumber) / t1.customerCountPerOffice, 2) >= 75 THEN '4 stars'
+		WHEN ROUND(100 * COUNT(c.customerNumber) / t1.customerCountPerOffice, 2) >= 50 THEN '3 stars'
+		WHEN ROUND(100 * COUNT(c.customerNumber) / t1.customerCountPerOffice, 2) >= 40 THEN '2 stars'
+		ELSE '1 star'
+	END AS sellerQuality
 FROM employees e 
 LEFT JOIN offices o2 
 	USING(officeCode)
@@ -280,4 +288,5 @@ LEFT JOIN (
 		ON e.employeeNumber = c.salesRepEmployeeNumber 
 	GROUP BY o.officeCode) AS t1
 	USING(officeCode)
-GROUP BY e.employeeNumber, e.officeCode , t1.customerCountPerOffice;
+GROUP BY e.employeeNumber, e.officeCode , t1.customerCountPerOffice
+ORDER BY sellerQuality DESC, employeeCustomerPercentage DESC;
